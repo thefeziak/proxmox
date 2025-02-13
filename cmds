@@ -26,6 +26,3 @@ TAILSCALE:
 
 curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up
-
-crontab -e # select: 1 (nano)
-@reboot /usr/bin/tailscale up --accept-routes # on the end of file
