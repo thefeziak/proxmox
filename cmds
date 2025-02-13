@@ -1,8 +1,31 @@
-sudo su
+sudo -i
 apt update
-apt install qemu-system qemu-system-x86 qemu-utils novnc websockify -y
+apt install qemu-system qemu-system-x86 qemu-utils novnc websockify screen -y
 wget https://enterprise.proxmox.com/iso/proxmox-ve_8.3-1.iso
 mv proxmox-ve_8.3-1.iso proxmox.iso
-qemu-img create -f qcow2 /tmp/disk.img 80G
-websockify --web /usr/share/novnc/ 8006 localhost:5900
-qemu-system-x86_64 -cdrom proxmox.iso --enable-kvm -vnc :0 -m 10G -drive file=/tmp/disk.img,format=qcow2
+qemu-img create -f qcow2 /tmp/proxmox-disk.img 80G
+screen -dm bash -c 'websockify --web /usr/share/novnc/ 8006 localhost:5900; exec bash'
+qemu-system-x86_64 -cdrom proxmox.iso --enable-kvm -vnc :0 -smp sockets=1,cores=64,threads=2 -m 15.6G -drive file=/tmp/proxmox-disk.img,format=qcow2 -cpu host
+
+
+APT REPAIR:
+
+nano /etc/apt/sources.list.d/pve-enterprise.list
+
+#deb https://enterprise.proxmox.com/debian/pve bookworm pve-enterprise
+deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription
+
+nano /etc/apt/sources.list.d/ceph.list
+
+#deb https://enterprise.proxmox.com/debian/ceph-quincy bookworm enterprise
+deb http://download.proxmox.com/debian/ceph-quincy bookworm no-subscription
+
+apt-get update && apt-get upgrade -y
+
+TAILSCALE:
+
+curl -fsSL https://tailscale.com/install.sh | sh
+tailscale up
+
+crontab -e # select: 1 (nano)
+@reboot /usr/bin/tailscale up --accept-routes # on the end of file
