@@ -3,9 +3,9 @@ apt update
 apt install qemu-system qemu-system-x86 qemu-utils novnc websockify screen -y
 wget https://enterprise.proxmox.com/iso/proxmox-ve_8.3-1.iso
 mv proxmox-ve_8.3-1.iso proxmox.iso
-qemu-img create -f qcow2 /tmp/proxmox-disk.img 80G
+qemu-img create -f qcow2 proxmox-disk.img 20G
 screen -dm bash -c 'websockify --web /usr/share/novnc/ 8006 localhost:5900; exec bash'
-qemu-system-x86_64 -cdrom proxmox.iso --enable-kvm -vnc :0 -smp sockets=1,cores=64,threads=2 -m 15.6G -drive file=/tmp/proxmox-disk.img,format=qcow2 -cpu host
+qemu-system-x86_64 -cdrom proxmox.iso --enable-kvm -vnc :0 -smp sockets=1,cores=64,threads=2 -m 15.6G -drive file=proxmox-disk.img,format=qcow2 -cpu host
 
 
 APT REPAIR:
