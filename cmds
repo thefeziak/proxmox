@@ -1,1 +1,8 @@
-
+sudo su
+apt update
+apt install qemu-system qemu-system-x86 qemu-utils novnc websockify -y
+wget https://enterprise.proxmox.com/iso/proxmox-ve_8.3-1.iso
+mv proxmox-ve_8.3-1.iso proxmox.iso
+qemu-img create -f qcow2 /tmp/disk.img 80G
+websockify --web /usr/share/novnc/ 8006 localhost:5900
+qemu-system-x86_64 -cdrom proxmox.iso --enable-kvm -vnc :0 -m 10G -drive file=/tmp/disk.img,format=qcow2
